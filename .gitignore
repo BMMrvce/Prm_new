@@ -1,0 +1,32 @@
+node_modules/
+.next/
+out/
+dist/
+build/
+.cache/
+.env*
+!.env.example
+next-env.d.ts
+# Local fallback for connected-account sign-ins (see src/lib/connections.ts)
+.data/
+*.tsbuildinfo
+*-debug.log*
+logs/
+*.log
+.figma/runtime/
+.tmp-*
+/.figma/design-context/
+
+# Platform-managed agentplat state, not project source. In the
+# client-initiated single-repo workspace layout (make's `Path: "."` spec) the
+# repo root IS the workspace root, so these land inside this repo rather than
+# beside it.
+/.plugins/
+/.opencode-skills/
+
+# Env file for importing into Vercel (contains secrets)
+add.env
+
+# Copied from node_modules at install time (scripts/copy-excalidraw-assets.mjs)
+/public/excalidraw/
+

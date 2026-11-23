@@ -1,0 +1,218 @@
+import type { KeyboardEvent } from 'react'
+import { cn } from './cn'
+
+/**
+ * Small dependency-free charts. Series colors are CSS variables from the design tokens
+ * (light: indigo, turquoise; dark: yellow, cyan), so they follow the theme; text always
+ * uses ink colors, never the series color.
+ */
+export const SERIES = ['var(--series-1)', 'var(--series-2)'] as const
+
+export type Series = { name: string; color: string }
+
+/** Rounds up to a clean axis maximum (1, 2, 2.5, 5 × 10ⁿ). */
+export function niceMax(value: number) {
+  if (value <= 0) return 1
+  const power = 10 ** Math.floor(Math.log10(value))
+  const step = [1, 2, 2.5, 5, 10].find((n) => n * power >= value) ?? 10
+  return step * power
+}
+
+const activate = (handler: () => void) => (event: KeyboardEvent) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    handler()
+  }
+}
+
+export function Legend({ series }: { series: Series[] }) {
+  if (series.length < 2) return null
+  return (
+    <div className="flex flex-wrap gap-x-4 gap-y-1 text-2xs text-ink-2">
+      {series.map((item) => (
+        <span key={item.name} className="flex items-center gap-1.5">
+          <span className="size-2.5 rounded-[2px]" style={{ background: item.color }} aria-hidden />
+          {item.name}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+/**
+ * Columns over a shared baseline, one group per label and one column per series.
+ * Hovering or focusing a group shows every series' value for it.
+ */
+export function ColumnChart({
+  data,
+  series,
+  format,
+  axisFormat = format,
+  height = 180,
+  labelEvery = 1,
+  selected = -1,
+  onSelect,
+  label,
+}: {
+  data: { label: string; detail?: string; values: number[] }[]
+  series: Series[]
+  /** Formats values in the tooltip (and the axis unless `axisFormat` is given). */
+  format: (value: number) => string
+  axisFormat?: (value: number) => string
+  height?: number
+  /** Show every Nth x label when columns are dense. */
+  labelEvery?: number
+  /** Index of the highlighted column group, if any. */
+  selected?: number
+  /** Makes each column group clickable. */
+  onSelect?: (index: number) => void
+  /** Accessible name of the chart. */
+  label?: string
+}) {
+  const max = niceMax(Math.max(0, ...data.flatMap((item) => item.values)))
+  const ticks = [max, max / 2, 0]
+
+  return (
+    <div className="flex min-w-0 gap-2" role="group" aria-label={label}>
+      <div className="flex shrink-0 flex-col justify-between text-right text-2xs leading-none text-ink-3" style={{ height }} aria-hidden>
+        {ticks.map((tick) => (
+          <span key={tick}>{axisFormat(tick)}</span>
+        ))}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="relative" style={{ height }}>
+          {ticks.map((tick, index) => (
+            <div
+              key={tick}
+              className={cn('absolute inset-x-0 border-t', index === ticks.length - 1 ? 'border-line-strong' : 'border-line')}
+              style={{ top: `${(index / (ticks.length - 1)) * 100}%` }}
+            />
+          ))}
+          <ul className="absolute inset-0 flex">
+            {data.map((item, index) => {
+              const align = index < data.length / 3 ? 'left-0' : index > (data.length * 2) / 3 ? 'right-0' : 'left-1/2 -translate-x-1/2'
+              const text = `${item.detail ?? item.label}: ${series.map((entry, slot) => `${entry.name} ${format(item.values[slot] ?? 0)}`).join(', ')}`
+              return (
+                <li
+                  key={`${index}:${item.label}`}
+                  className={cn(
+                    'group relative flex h-full min-w-0 flex-1 items-end justify-center gap-[2px] rounded-t-md outline-none hover:bg-surface-2 focus-visible:bg-surface-2',
+                    index === selected && 'bg-primary-subtle',
+                    onSelect && 'cursor-pointer',
+                  )}
+                  // Focusable so keyboard users can read each value in the tooltip.
+                  // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                  tabIndex={0}
+                  aria-label={text}
+                  {...(onSelect
+                    ? { role: 'button', 'aria-pressed': index === selected, onClick: () => onSelect(index), onKeyDown: activate(() => onSelect(index)) }
+                    : {})}
+                >
+                  {series.map((entry, slot) => {
+                    const value = item.values[slot] ?? 0
+                    return (
+                      <div
+                        key={entry.name}
+                        className="rounded-t-[4px] transition-[height] duration-300 motion-reduce:transition-none"
+                        style={{
+                          width: `min(24px, ${70 / series.length}%)`,
+                          height: value > 0 ? `max(2px, ${(value / max) * 100}%)` : 0,
+                          background: entry.color,
+                        }}
+                      />
+                    )
+                  })}
+                  <div
+                    className={cn(
+                      'neo-popover pointer-events-none absolute top-0 z-10 hidden w-max max-w-[180px] rounded-md px-2.5 py-1.5 text-2xs group-hover:block group-focus-visible:block',
+                      align,
+                    )}
+                    aria-hidden
+                  >
+                    <p className="text-ink-2">{item.detail ?? item.label}</p>
+                    {series.map((entry, slot) => (
+                      <p key={entry.name} className="flex items-center gap-1.5">
+                        <span className="h-0.5 w-2.5" style={{ background: entry.color }} />
+                        <strong className="font-semibold text-ink">{format(item.values[slot] ?? 0)}</strong>
+                        {series.length > 1 && <span className="text-ink-2">{entry.name}</span>}
+                      </p>
+                    ))}
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+        <div className="mt-1.5 flex" aria-hidden>
+          {data.map((item, index) => (
+            <span key={`${index}:${item.label}`} className="min-w-0 flex-1 overflow-visible text-center text-2xs whitespace-nowrap text-ink-3">
+              {index % labelEvery === 0 ? item.label : ''}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Horizontal bars, one row per item, each row holding one bar per series with its
+ * value at the tip. Labels sit above the bars so long names never squeeze them.
+ */
+export function BarRows({
+  rows,
+  series,
+  format,
+  onSelect,
+}: {
+  rows: { label: string; values: number[] }[]
+  series: Series[]
+  format: (value: number) => string
+  /** Makes each row clickable, e.g. to filter by it. */
+  onSelect?: (index: number) => void
+}) {
+  const max = Math.max(0, ...rows.flatMap((row) => row.values)) || 1
+  return (
+    <ul className="space-y-3">
+      {rows.map((row, index) => (
+        <li key={`${index}:${row.label}`} className="min-w-0">
+          <div
+            className={cn('min-w-0', onSelect && '-mx-1.5 cursor-pointer rounded-md px-1.5 py-0.5 hover:bg-surface-2')}
+            {...(onSelect ? { tabIndex: 0, role: 'button', onClick: () => onSelect(index), onKeyDown: activate(() => onSelect(index)) } : {})}
+          >
+            <p className="truncate text-xs text-ink">{row.label}</p>
+            <div className="mt-1 space-y-[2px]">
+              {series.map((entry, slot) => {
+                const value = row.values[slot] ?? 0
+                return (
+                  <div key={entry.name} className="flex items-center gap-1.5" title={`${entry.name}: ${format(value)}`}>
+                    <div
+                      className="h-2.5 shrink-0 rounded-r-[4px]"
+                      style={{ width: value > 0 ? `max(2px, calc((100% - 4rem) * ${value / max}))` : 0, background: entry.color }}
+                      aria-hidden
+                    />
+                    <span className="shrink-0 text-2xs text-ink-2 tabular-nums">
+                      <span className="sr-only">{entry.name}: </span>
+                      {format(value)}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** Label · value · optional note, for headline numbers above the charts. */
+export function StatTile({ label, value, note, className }: { label: string; value: string; note?: string; className?: string }) {
+  return (
+    <div className={cn('neo-card min-w-0 rounded-xl p-4', className)}>
+      <p className="text-xs text-ink-2">{label}</p>
+      <p className="mt-1 truncate text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
+      {note && <p className="mt-0.5 truncate text-2xs text-ink-3">{note}</p>}
+    </div>
+  )
+}

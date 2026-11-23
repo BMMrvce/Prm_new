@@ -1,0 +1,1116 @@
+@import 'tailwindcss';
+
+/* `dark:` follows the theme switcher (html.dark), not only the device setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * ಸKala² design tokens. Every color in the UI comes from these variables, exposed to
+ * Tailwind as `bg-primary`, `text-ink-2`, `border-line` and so on; `html.dark` swaps the
+ * values, so components never need dark-specific classes.
+ *
+ * Two intentional identities, not an inversion of one another:
+ *   Light: lavender-grey sidebar, white cards, deep indigo signature, turquoise support.
+ *   Dark:  near-black canvas, charcoal cards, bright yellow signature, bright colors.
+ * The spec palette values are the source of truth (marked "spec"); everything else is a
+ * tint or shade of them. `*-ink` tokens are the text-safe shade of a color (≥ 4.5:1 on
+ * cards) for places where the raw brand color would be too low-contrast to read.
+ *
+ * Roles:
+ *   primary    signature fills (buttons, today, checkboxes), links via primary-ink
+ *   secondary  the second brand color (turquoise / yellow)
+ *   accent     the complementary highlight: meetings, live timers, progress
+ *              (turquoise in light, bright blue in dark so it differs from yellow)
+ *   accent-blue the spec's accent blue, available in both themes
+ */
+:root {
+  /* Text size: 1.1 by default; Account → Preferences changes it (saved per browser). */
+  --font-scale: 1.1;
+
+  /* Brand: deep indigo (spec #423A8E) */
+  --brand-primary: #423a8e;
+  --brand-primary-hover: #382f7c;
+  --brand-primary-active: #2e2768;
+  --brand-primary-light: #ebeaf6;
+  --brand-primary-subtle: #f5f4fb;
+  --brand-primary-deep: #26205a;
+  --brand-primary-ink: #423a8e;
+  /* Brand: turquoise (spec #00CCCD) */
+  --brand-secondary: #00cccd;
+  --brand-secondary-hover: #00b4b5;
+  --brand-secondary-light: #dcf7f7;
+  --brand-secondary-subtle: #effcfc;
+  --brand-secondary-ink: #007879;
+  --on-secondary: #06302f;
+  /* Accent role: turquoise in light mode. */
+  --brand-accent: #00cccd;
+  --brand-accent-hover: #00b4b5;
+  --brand-accent-light: #e0f8f8;
+  --brand-accent-ink: #007879;
+  --accent-blue: #0d6efd;
+  --accent-blue-light: #e7f0ff;
+  --accent-blue-ink: #0a58ca;
+
+  /* Neutrals */
+  --background: #f3f4f8; /* spec */
+  --surface: #ffffff; /* spec */
+  --surface-secondary: #f6f7fa;
+  --surface-tertiary: #ecedf3;
+  --text-primary: #202238; /* spec */
+  --text-secondary: #727b91; /* spec */
+  --text-muted: #80879b;
+  --border: #e5e7ef; /* spec */
+  --border-strong: #d5d8e3;
+  --divider: #edeef4;
+  --on-primary: #ffffff;
+  --on-primary-muted: #cbc8ec;
+  /* Text on the deep brand panel (login), which stays dark in both themes. */
+  --on-deep: #ffffff;
+  --on-deep-muted: #cbc8ec;
+  --on-deep-accent: #3fe0e0;
+
+  /* Functional states; *-ink is the readable text shade, *-light the badge background. */
+  --success: #198754; /* spec */
+  --success-light: #e5f3ec;
+  --success-ink: #146c43;
+  --warning: #ffc107; /* spec */
+  --warning-light: #fff5d6;
+  --warning-ink: #7d5a00;
+  --error: #dc3545; /* spec */
+  --error-light: #fbe9eb;
+  --error-ink: #b02a37;
+  --info: #00cccd; /* spec */
+  --info-light: #ddf7f7;
+  --info-ink: #007172;
+
+  /* Meeting category colors (Settings → Meeting colors): dot, -light chip background, -ink text. */
+  --cat-blue: #0d6efd;
+  --cat-blue-light: #e7f0ff;
+  --cat-blue-ink: #0a58ca;
+  --cat-orange: #e5650a;
+  --cat-orange-light: #fff0e3;
+  --cat-orange-ink: #a14600;
+  --cat-green: #198754;
+  --cat-green-light: #e3f4ea;
+  --cat-green-ink: #136c42;
+  --cat-violet: #7a3fd1;
+  --cat-violet-light: #f1eafb;
+  --cat-violet-ink: #5f2db0;
+  --cat-pink: #d63384;
+  --cat-pink-light: #fce8f2;
+  --cat-pink-ink: #a3255f;
+  --cat-teal: #0f9a9b;
+  --cat-teal-light: #e0f6f6;
+  --cat-teal-ink: #0b6e6f;
+  --cat-amber: #b88a00;
+  --cat-amber-light: #fdf3d6;
+  --cat-amber-ink: #7a5c00;
+  --cat-slate: #64748b;
+  --cat-slate-light: #eef1f5;
+  --cat-slate-ink: #475569;
+  --cat-red: #d93a3a;
+  --cat-red-light: #fdebeb;
+  --cat-red-ink: #a32424;
+
+  /* Chart series: indigo then turquoise. */
+  --series-1: #423a8e;
+  --series-2: #00cccd;
+
+  /* Shell */
+  --sidebar: #e4e4f1; /* spec */
+  --sidebar-text: #4b5068;
+  --sidebar-muted: #5f6680;
+  --sidebar-card: #f1f1f8;
+  --nav-hover: #f0f0f8;
+  --nav-active: #423a8e;
+  --nav-active-text: #ffffff;
+  --nav-active-icon: #ffffff;
+  /* No edge marker in light mode: the indigo pill already marks the active page. */
+  --nav-active-bar: transparent;
+  --field: #ffffff;
+  --elevated: #ffffff;
+  /* Selected option in a segmented control (sits on surface-2). */
+  --segment: #ffffff;
+  --scrim: rgb(32 34 56 / 0.4);
+  --focus-ring: #423a8e;
+  /* Notes highlight (/highlight): a true marker yellow in both themes. */
+  --note-highlight: #fff3a3;
+  --note-highlight-ink: #3d3000;
+  --card-shadow: 0 1px 2px rgb(32 34 56 / 0.04), 0 1px 3px rgb(32 34 56 / 0.03);
+  --popover-shadow: 0 8px 24px rgb(32 34 56 / 0.1), 0 2px 6px rgb(32 34 56 / 0.05);
+}
+
+:root.dark {
+  /*
+   * Brand: bright yellow (#FFC107). Readable as text on charcoal (10.5:1), so primary-ink is
+   * the same color; text ON a yellow fill is near-black (on-primary, 11:1). Dark mode uses
+   * bright, saturated colors throughout; warning moves to orange so it never reads as brand.
+   */
+  --brand-primary: #ffc107;
+  --brand-primary-hover: #ffcd39;
+  --brand-primary-active: #e0a800;
+  --brand-primary-light: #3d361f;
+  --brand-primary-subtle: #2b2920;
+  --brand-primary-deep: #1f1a08;
+  --brand-primary-ink: #ffc107;
+  /* Secondary brand is the same yellow in dark mode. */
+  --brand-secondary: #ffc107;
+  --brand-secondary-hover: #ffcd39;
+  --brand-secondary-light: #3d361f;
+  --brand-secondary-subtle: #2b2920;
+  --brand-secondary-ink: #ffc107;
+  --on-secondary: #1b1500;
+  /* Accent role: bright blue, so meetings and timers differ from the yellow. */
+  --brand-accent: #3d8bfd;
+  --brand-accent-hover: #6ea8fe;
+  --brand-accent-light: #172b4d;
+  --brand-accent-ink: #8dbbff;
+  --accent-blue: #3d8bfd;
+  --accent-blue-light: #172b4d;
+  --accent-blue-ink: #8dbbff;
+
+  /* Neutrals */
+  --background: #000000; /* spec */
+  --surface: #191c24; /* spec */
+  --surface-secondary: #252935;
+  --surface-tertiary: #2f3441;
+  --text-primary: #ffffff; /* spec */
+  --text-secondary: #8490a8; /* spec */
+  --text-muted: #737e97;
+  --border: #292d38; /* spec */
+  --border-strong: #353a47;
+  --divider: #23262f;
+  --on-primary: #1b1500;
+  --on-primary-muted: #5c4a00;
+  --on-deep: #ffffff;
+  --on-deep-muted: #e8dcb4;
+  --on-deep-accent: #ffc107;
+
+  --success: #2fd27f;
+  --success-light: #123526;
+  --success-ink: #6ff0a8;
+  --warning: #ff9f1c;
+  --warning-light: #3a2a15;
+  --warning-ink: #ffbf66;
+  --error: #ff5c6c;
+  --error-light: #3d1c24;
+  --error-ink: #ff9aa5;
+  --info: #0dcaf0;
+  --info-light: #123c4a;
+  --info-ink: #6ee6ff;
+
+  --cat-blue: #5ea2ff;
+  --cat-blue-light: #172a4a;
+  --cat-blue-ink: #a3c9ff;
+  --cat-orange: #ff8a3d;
+  --cat-orange-light: #3a261c;
+  --cat-orange-ink: #ffb27f;
+  --cat-green: #3ddc84;
+  --cat-green-light: #16302a;
+  --cat-green-ink: #8eedb8;
+  --cat-violet: #b38cff;
+  --cat-violet-light: #2b2440;
+  --cat-violet-ink: #d3bdff;
+  --cat-pink: #ff6eb4;
+  --cat-pink-light: #3a1f2d;
+  --cat-pink-ink: #ffa8d2;
+  --cat-teal: #2ee6d6;
+  --cat-teal-light: #133537;
+  --cat-teal-ink: #94f2ea;
+  --cat-amber: #ffd23f;
+  --cat-amber-light: #3a3320;
+  --cat-amber-ink: #ffe38a;
+  --cat-slate: #a9b8cc;
+  --cat-slate-light: #262b35;
+  --cat-slate-ink: #d0dae6;
+  --cat-red: #ff6b6b;
+  --cat-red-light: #3a1d20;
+  --cat-red-ink: #ffb3b3;
+
+  /* Chart series: yellow then cyan. */
+  --series-1: #ffc107;
+  --series-2: #0dcaf0;
+
+  /* Shell */
+  --sidebar: #191c24; /* spec */
+  --sidebar-text: #8490a8;
+  --sidebar-muted: #737e97;
+  --sidebar-card: #0f1116;
+  --nav-hover: #22252f;
+  --nav-active: #0f1116;
+  --nav-active-text: #ffffff;
+  --nav-active-icon: #ffc107;
+  --nav-active-bar: #ffc107;
+  --field: #12141a;
+  --elevated: #1d2029;
+  --segment: #363b49;
+  --scrim: rgb(0 0 0 / 0.65);
+  --focus-ring: #ffc107;
+  --note-highlight: #ffc107;
+  --note-highlight-ink: #1b1500;
+  --card-shadow: none;
+  --popover-shadow: 0 12px 32px rgb(0 0 0 / 0.55);
+}
+
+/*
+ * ── Mono style (the default) ─────────────────────────────────────────────────────────
+ * Simple and minimal: off-white canvas, white panels with hairline borders, one green
+ * accent for actions, a soft grey active pill, flat surfaces and tight corners.
+ * `html[data-style='classic']` (Account → Preferences → Style) keeps the indigo/yellow
+ * identity above. Mono redefines every brand, neutral and shell token; the meeting
+ * category colors and functional `-ink` shades are shared.
+ */
+:root:not([data-style='classic']) {
+  --brand-primary: #1a7f4e;
+  --brand-primary-hover: #166d43;
+  --brand-primary-active: #125c38;
+  --brand-primary-light: #e7f5ed;
+  --brand-primary-subtle: #f3faf6;
+  --brand-primary-deep: #121212;
+  --brand-primary-ink: #15703f;
+  --brand-secondary: #16a34a;
+  --brand-secondary-hover: #15803d;
+  --brand-secondary-light: #e9f7ee;
+  --brand-secondary-subtle: #f3fbf6;
+  --brand-secondary-ink: #15803d;
+  --on-secondary: #ffffff;
+  --brand-accent: #2563eb;
+  --brand-accent-hover: #1d4ed8;
+  --brand-accent-light: #eef3ff;
+  --brand-accent-ink: #1d4ed8;
+
+  --background: #fcfcfc;
+  --surface: #ffffff;
+  --surface-secondary: #f7f7f7;
+  --surface-tertiary: #efefef;
+  --text-primary: #171717;
+  --text-secondary: #5f5f5f;
+  --text-muted: #7a7a7a;
+  --border: #e6e6e6;
+  --border-strong: #dadada;
+  --divider: #efefef;
+  --on-primary: #ffffff;
+  --on-primary-muted: #c9ead8;
+  --on-deep: #ffffff;
+  --on-deep-muted: #b4b4bc;
+  --on-deep-accent: #3ecf8e;
+
+  --success: #16a34a;
+  --success-light: #e9f7ee;
+  --success-ink: #15803d;
+  --warning: #f59e0b;
+  --warning-light: #fef5e2;
+  --warning-ink: #92580a;
+  --error: #dc2626;
+  --error-light: #fdecec;
+  --error-ink: #b91c1c;
+  --info: #0891b2;
+  --info-light: #e6f6fa;
+  --info-ink: #0e7490;
+
+  --series-1: #3ecf8e;
+  --series-2: #f5a524;
+
+  --sidebar: #fcfcfc;
+  --sidebar-text: #404040;
+  --sidebar-muted: #8a8a8a;
+  --sidebar-card: #ffffff;
+  --nav-hover: #f2f2f2;
+  --nav-active: #ededed;
+  --nav-active-text: #171717;
+  --nav-active-icon: #171717;
+  --nav-active-bar: transparent;
+  --field: #ffffff;
+  --elevated: #ffffff;
+  --segment: #ffffff;
+  --scrim: rgb(24 24 27 / 0.32);
+  --focus-ring: #1a7f4e;
+  --card-shadow: 0 1px 1px rgb(0 0 0 / 0.02);
+  --popover-shadow: 0 8px 24px rgb(0 0 0 / 0.08), 0 1px 3px rgb(0 0 0 / 0.04);
+
+  /* Mono-only: dotted canvas, light greeting panel, slightly tighter corners. */
+  --canvas-dots: transparent;
+  --greeting-bg: var(--surface);
+  --greeting-text: var(--text-primary);
+  --greeting-muted: var(--text-secondary);
+  --greeting-accent: var(--success-ink);
+  --greeting-border: var(--border);
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.75rem;
+  --radius-lg: 0.375rem;
+}
+
+:root.dark:not([data-style='classic']) {
+  --brand-primary: #3ecf8e;
+  --brand-primary-hover: #5fdba3;
+  --brand-primary-active: #2fb87a;
+  --brand-primary-light: #16301f;
+  --brand-primary-subtle: #112217;
+  --brand-primary-deep: #121212;
+  --brand-primary-ink: #3ecf8e;
+  --brand-secondary: #4ade80;
+  --brand-secondary-hover: #86efac;
+  --brand-secondary-light: #14301f;
+  --brand-secondary-subtle: #0f2418;
+  --brand-secondary-ink: #86efac;
+  --on-secondary: #052e14;
+  --brand-accent: #60a5fa;
+  --brand-accent-hover: #93c5fd;
+  --brand-accent-light: #172540;
+  --brand-accent-ink: #93c5fd;
+
+  --background: #121212;
+  --surface: #171717;
+  --surface-secondary: #1f1f1f;
+  --surface-tertiary: #262626;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #85858f;
+  --border: #2a2a2a;
+  --border-strong: #363636;
+  --divider: #222222;
+  --on-primary: #052e1a;
+  --on-primary-muted: #14532d;
+  --on-deep: #fafafa;
+  --on-deep-muted: #a1a1aa;
+  --on-deep-accent: #86efac;
+
+  --success: #4ade80;
+  --success-light: #13291b;
+  --success-ink: #86efac;
+  --warning: #fbbf24;
+  --warning-light: #33270f;
+  --warning-ink: #fcd34d;
+  --error: #f87171;
+  --error-light: #3a1818;
+  --error-ink: #fca5a5;
+  --info: #22d3ee;
+  --info-light: #102f36;
+  --info-ink: #67e8f9;
+
+  --series-1: #3ecf8e;
+  --series-2: #fbbf24;
+
+  --sidebar: #141414;
+  --sidebar-text: #c4c4cc;
+  --sidebar-muted: #7c7c86;
+  --sidebar-card: #1a1a1a;
+  --nav-hover: #1f1f1f;
+  --nav-active: #262626;
+  --nav-active-text: #fafafa;
+  --nav-active-icon: #fafafa;
+  --nav-active-bar: transparent;
+  --field: #111113;
+  --elevated: #1a1a1d;
+  --segment: #2e2e32;
+  --scrim: rgb(0 0 0 / 0.6);
+  --focus-ring: #3ecf8e;
+  --card-shadow: none;
+  --popover-shadow: 0 16px 40px rgb(0 0 0 / 0.6);
+
+  --canvas-dots: transparent;
+}
+
+/* Classic keeps its deep indigo greeting banner. */
+:root {
+  --canvas-dots: transparent;
+  --greeting-bg: var(--brand-primary-deep);
+  --greeting-text: var(--on-deep);
+  --greeting-muted: var(--on-deep-muted);
+  --greeting-accent: var(--on-deep-accent);
+  --greeting-border: transparent;
+}
+
+@theme inline {
+  /* Inline so the utilities read next/font's variables, which are set on <body>, not :root. */
+  --font-sans: var(--font-app), ui-sans-serif, system-ui, sans-serif;
+
+  /*
+   * Type scale (dense product UI, 13px body). Each size carries its line height and the
+   * letter spacing Inter needs at that size, so components only pick a name.
+   */
+  --text-2xs: calc(11px * var(--font-scale));
+  --text-2xs--line-height: calc(16px * var(--font-scale));
+  --text-2xs--letter-spacing: 0.005em;
+  --text-xs: calc(12px * var(--font-scale));
+  --text-xs--line-height: calc(16px * var(--font-scale));
+  --text-ui: calc(13px * var(--font-scale));
+  --text-ui--line-height: calc(20px * var(--font-scale));
+  --text-ui--letter-spacing: -0.003em;
+  --text-sm: calc(14px * var(--font-scale));
+  --text-sm--line-height: calc(20px * var(--font-scale));
+  --text-sm--letter-spacing: -0.006em;
+  --text-card: calc(15px * var(--font-scale));
+  --text-card--line-height: calc(22px * var(--font-scale));
+  --text-card--letter-spacing: -0.01em;
+  --text-base: calc(16px * var(--font-scale));
+  --text-base--line-height: calc(24px * var(--font-scale));
+  --text-base--letter-spacing: -0.011em;
+  --text-lg: calc(18px * var(--font-scale));
+  --text-lg--line-height: calc(26px * var(--font-scale));
+  --text-lg--letter-spacing: -0.014em;
+  --text-xl: calc(20px * var(--font-scale));
+  --text-xl--line-height: calc(28px * var(--font-scale));
+  --text-xl--letter-spacing: -0.017em;
+  --text-2xl: calc(24px * var(--font-scale));
+  --text-2xl--line-height: calc(32px * var(--font-scale));
+  --text-2xl--letter-spacing: -0.019em;
+  --text-3xl: calc(30px * var(--font-scale));
+  --text-3xl--line-height: calc(36px * var(--font-scale));
+  --text-3xl--letter-spacing: -0.021em;
+  --text-5xl: calc(48px * var(--font-scale));
+  --text-5xl--line-height: 1.08;
+  --text-5xl--letter-spacing: -0.03em;
+  --font-handwritten: var(--font-handwritten-face), 'Comic Sans MS', cursive;
+
+  --color-primary: var(--brand-primary);
+  --color-primary-hover: var(--brand-primary-hover);
+  --color-primary-active: var(--brand-primary-active);
+  --color-primary-light: var(--brand-primary-light);
+  --color-primary-subtle: var(--brand-primary-subtle);
+  --color-primary-deep: var(--brand-primary-deep);
+  --color-primary-ink: var(--brand-primary-ink);
+  --color-secondary: var(--brand-secondary);
+  --color-secondary-hover: var(--brand-secondary-hover);
+  --color-secondary-light: var(--brand-secondary-light);
+  --color-secondary-subtle: var(--brand-secondary-subtle);
+  --color-secondary-ink: var(--brand-secondary-ink);
+  --color-on-secondary: var(--on-secondary);
+  --color-accent: var(--brand-accent);
+  --color-accent-hover: var(--brand-accent-hover);
+  --color-accent-light: var(--brand-accent-light);
+  --color-accent-ink: var(--brand-accent-ink);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-blue-light: var(--accent-blue-light);
+  --color-accent-blue-ink: var(--accent-blue-ink);
+
+  --color-canvas: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-secondary);
+  --color-surface-3: var(--surface-tertiary);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-ink: var(--sidebar-text);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-card: var(--sidebar-card);
+  --color-nav-hover: var(--nav-hover);
+  --color-nav-active-icon: var(--nav-active-icon);
+  --color-nav-active-bar: var(--nav-active-bar);
+  --color-segment: var(--segment);
+  --color-scrim: var(--scrim);
+  --color-field: var(--field);
+  --color-elevated: var(--elevated);
+  --color-nav-active: var(--nav-active);
+  --color-nav-active-text: var(--nav-active-text);
+  --color-ink: var(--text-primary);
+  --color-ink-2: var(--text-secondary);
+  --color-ink-3: var(--text-muted);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-line-soft: var(--divider);
+  --color-on-primary: var(--on-primary);
+  --color-on-primary-muted: var(--on-primary-muted);
+  --color-cat-blue: var(--cat-blue);
+  --color-cat-blue-light: var(--cat-blue-light);
+  --color-cat-blue-ink: var(--cat-blue-ink);
+  --color-cat-orange: var(--cat-orange);
+  --color-cat-orange-light: var(--cat-orange-light);
+  --color-cat-orange-ink: var(--cat-orange-ink);
+  --color-cat-green: var(--cat-green);
+  --color-cat-green-light: var(--cat-green-light);
+  --color-cat-green-ink: var(--cat-green-ink);
+  --color-cat-violet: var(--cat-violet);
+  --color-cat-violet-light: var(--cat-violet-light);
+  --color-cat-violet-ink: var(--cat-violet-ink);
+  --color-cat-pink: var(--cat-pink);
+  --color-cat-pink-light: var(--cat-pink-light);
+  --color-cat-pink-ink: var(--cat-pink-ink);
+  --color-cat-teal: var(--cat-teal);
+  --color-cat-teal-light: var(--cat-teal-light);
+  --color-cat-teal-ink: var(--cat-teal-ink);
+  --color-cat-amber: var(--cat-amber);
+  --color-cat-amber-light: var(--cat-amber-light);
+  --color-cat-amber-ink: var(--cat-amber-ink);
+  --color-cat-slate: var(--cat-slate);
+  --color-cat-slate-light: var(--cat-slate-light);
+  --color-cat-slate-ink: var(--cat-slate-ink);
+  --color-cat-red: var(--cat-red);
+  --color-cat-red-light: var(--cat-red-light);
+  --color-cat-red-ink: var(--cat-red-ink);
+  --color-on-deep: var(--on-deep);
+  --color-on-deep-muted: var(--on-deep-muted);
+  --color-on-deep-accent: var(--on-deep-accent);
+
+  --color-success: var(--success);
+  --color-success-light: var(--success-light);
+  --color-success-ink: var(--success-ink);
+  --color-warning: var(--warning);
+  --color-warning-light: var(--warning-light);
+  --color-warning-ink: var(--warning-ink);
+  --color-error: var(--error);
+  --color-error-light: var(--error-light);
+  --color-error-ink: var(--error-ink);
+  --color-info: var(--info);
+  --color-info-light: var(--info-light);
+  --color-info-ink: var(--info-ink);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    background: var(--background);
+    color: var(--text-primary);
+    color-scheme: light;
+  }
+
+  /* The page itself never scrolls sideways; wide content (the board) scrolls in place. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  ::placeholder {
+    color: var(--text-muted);
+  }
+
+  ::selection {
+    background: var(--brand-primary-light);
+  }
+
+  body {
+    font-family: var(--font-app), ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    /* Inter: tailed l (tells l from I) and curly quotes; crisp, legible rendering. */
+    font-feature-settings:
+      'cv05' 1,
+      'ss03' 1;
+    font-optical-sizing: auto;
+    text-rendering: optimizeLegibility;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * Shantell Sans, fully informal with a little bounce: letters wobble like handwriting.
+ * Sized to Inter's x-height (0.54) so the To Do list reads at the same size as the rest.
+ */
+.font-handwritten {
+  font-variation-settings:
+    'INFM' 100,
+    'BNCE' 40;
+  font-size-adjust: 0.54;
+}
+
+/* Cards: hairline border and, in light mode only, a barely-there shadow. */
+/* App canvas: a faint dot grid in Mono (transparent dots in Classic). */
+.app-canvas {
+  background-color: var(--background);
+  background-image: radial-gradient(var(--canvas-dots) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+/* Dashboard greeting: a light panel in Mono, the deep brand banner in Classic. */
+.greeting-panel {
+  background: var(--greeting-bg);
+  color: var(--greeting-text);
+  border: 1px solid var(--greeting-border);
+  box-shadow: var(--card-shadow);
+}
+
+.neo-card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+/* Floating layers (menus, popovers, toasts): elevated surface with a soft drop shadow. */
+.neo-popover {
+  border: 1px solid var(--border);
+  background: var(--elevated);
+  box-shadow: var(--popover-shadow);
+}
+
+
+.neo-control {
+  border: 1px solid var(--border-strong);
+  background: var(--field);
+  box-shadow: none;
+}
+
+dialog::backdrop {
+  background: var(--scrim);
+}
+
+/*
+ * Rich text written in the app: the mail composer and Notes. Tailwind's reset strips list
+ * markers and heading sizes, so they are restored here. `nc-*` classes are the Notes
+ * slash-command styles (to-dos, colored text, highlights, callouts); colors reuse the
+ * theme's category inks so they stay readable in light and dark mode.
+ */
+@layer components {
+  .rich-content {
+    overflow-wrap: anywhere;
+  }
+  .rich-content :where(p, div, ul, ol, blockquote, pre, h1, h2, h3, hr) + :where(*) {
+    margin-top: 0.35em;
+  }
+  .rich-content ul {
+    list-style: disc;
+    padding-left: 1.4em;
+  }
+  .rich-content ol {
+    list-style: decimal;
+    padding-left: 1.4em;
+  }
+  .rich-content h1 {
+    font-size: 1.5em;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-top: 0.6em;
+  }
+  .rich-content h2 {
+    font-size: 1.25em;
+    font-weight: 650;
+    line-height: 1.3;
+    margin-top: 0.5em;
+  }
+  .rich-content h3 {
+    font-size: 1.08em;
+    font-weight: 600;
+    margin-top: 0.4em;
+  }
+  .rich-content blockquote {
+    border-left: 3px solid var(--border-strong);
+    padding-left: 0.85em;
+    color: var(--text-secondary);
+  }
+  .rich-content a {
+    color: var(--brand-primary-ink);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .rich-content code {
+    border-radius: 4px;
+    background: var(--surface-secondary);
+    padding: 0.1em 0.35em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+  }
+  .rich-content pre {
+    border-radius: 8px;
+    background: var(--surface-secondary);
+    padding: 0.75em 1em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.88em;
+    white-space: pre-wrap;
+  }
+  .rich-content hr {
+    border: 0;
+    border-top: 1px solid var(--border-strong);
+    margin: 0.9em 0;
+  }
+
+  /* /todo: a checklist; the box is drawn by CSS and toggled by clicking it. */
+  .rich-content ul[data-type='todo'] {
+    list-style: none;
+    padding-left: 0;
+  }
+  .rich-content ul[data-type='todo'] > li {
+    position: relative;
+    padding-left: 1.75em;
+  }
+  .rich-content ul[data-type='todo'] > li::before {
+    content: '';
+    position: absolute;
+    left: 0.1em;
+    top: 0.3em;
+    width: 1.05em;
+    height: 1.05em;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 4px;
+    background: var(--field);
+    cursor: pointer;
+  }
+  .rich-content ul[data-type='todo'] > li[data-checked='true'] {
+    color: var(--text-muted);
+    text-decoration: line-through;
+  }
+  .rich-content ul[data-type='todo'] > li[data-checked='true']::before {
+    border-color: var(--brand-primary);
+    background: var(--brand-primary)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.5l3 3 6-7'/%3E%3C/svg%3E")
+      center / 80% no-repeat;
+  }
+  :root.dark .rich-content ul[data-type='todo'] > li[data-checked='true']::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%231b1500' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.5l3 3 6-7'/%3E%3C/svg%3E");
+  }
+
+  /* Colored text (/yellowtext, /redtext …) and highlights (/highlight). */
+  .rich-content .nc-yellow {
+    color: var(--cat-amber-ink);
+  }
+  .rich-content .nc-orange {
+    color: var(--cat-orange-ink);
+  }
+  .rich-content .nc-red {
+    color: var(--error-ink);
+  }
+  .rich-content .nc-green {
+    color: var(--cat-green-ink);
+  }
+  .rich-content .nc-blue {
+    color: var(--cat-blue-ink);
+  }
+  .rich-content .nc-purple {
+    color: var(--cat-violet-ink);
+  }
+  .rich-content .nc-pink {
+    color: var(--cat-pink-ink);
+  }
+  .rich-content .nc-hl-yellow {
+    background: var(--note-highlight);
+    color: var(--note-highlight-ink);
+    border-radius: 3px;
+    padding: 0 0.15em;
+  }
+  .rich-content .nc-hl-green {
+    background: var(--cat-green-light);
+    color: var(--cat-green-ink);
+    border-radius: 3px;
+    padding: 0 0.15em;
+  }
+  .rich-content .nc-hl-blue {
+    background: var(--cat-blue-light);
+    color: var(--cat-blue-ink);
+    border-radius: 3px;
+    padding: 0 0.15em;
+  }
+  .rich-content .nc-hl-pink {
+    background: var(--cat-pink-light);
+    color: var(--cat-pink-ink);
+    border-radius: 3px;
+    padding: 0 0.15em;
+  }
+  /* A highlighted line is marked only as wide as its text. */
+  .rich-content :is(p, h1, h2, h3)[class*='nc-hl-'] {
+    width: fit-content;
+    max-width: 100%;
+  }
+  /* /callout: a tinted note block. */
+  .rich-content .nc-callout {
+    border-left: 3px solid var(--brand-primary);
+    border-radius: 8px;
+    background: var(--brand-primary-subtle);
+    padding: 0.6em 0.85em;
+  }
+}
+
+/*
+ * Motion: one family of curves so everything moves alike. `--ease-out` settles softly (most
+ * UI); `--ease-spring` overshoots a touch (presses, check marks). Durations stay short.
+ * All of it is off for people who ask for reduced motion.
+ */
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  .neo-card,
+  .neo-popover,
+  .neo-control {
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+    transition-duration: 180ms, 180ms, 180ms, 180ms, 180ms, 260ms;
+    /* Colors settle softly; only movement (transform) gets the springy overshoot. */
+    transition-timing-function:
+      var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-out),
+      var(--ease-spring);
+  }
+
+  /* Press: a quick squeeze that springs back on release. */
+  button:not(:disabled):active {
+    transform: scale(0.97);
+    transition-duration: 90ms;
+  }
+
+  .animate-pop {
+    animation: pop-in 200ms var(--ease-out);
+    transform-origin: top right;
+  }
+
+  /* Page changes: the view transition below; this fade is the fallback without it. */
+  @supports not (view-transition-name: none) {
+    .animate-page {
+      animation: page-in 260ms var(--ease-out);
+    }
+  }
+
+  ::view-transition-old(.page-exit) {
+    animation: 120ms var(--ease-in) both fade-out;
+  }
+
+  ::view-transition-new(.page-enter) {
+    animation: 280ms var(--ease-out) 40ms both page-in;
+  }
+
+  .animate-toast {
+    animation: toast-in 320ms var(--ease-out);
+  }
+
+  /* Completing a task: the check mark springs in. */
+  .animate-check {
+    animation: check-pop 320ms var(--ease-spring);
+  }
+
+  /* Revealed sections (e.g. "Completed today") slide open. */
+  .animate-reveal {
+    animation: page-in 240ms var(--ease-out);
+  }
+
+  .modal-dialog[open] {
+    animation: dialog-in 280ms var(--ease-out);
+  }
+
+  .modal-dialog[open]::backdrop {
+    animation: fade-in 240ms var(--ease-out);
+  }
+
+  /*
+   * List rows (tasks, meetings, mail, notes) fade and rise in when they appear: on load,
+   * when added, and when switching views. Pure CSS (@starting-style), so it costs nothing.
+   */
+  .animate-row {
+    transition:
+      opacity 280ms var(--ease-out),
+      transform 280ms var(--ease-out),
+      background-color 160ms var(--ease-out);
+  }
+  @starting-style {
+    .animate-row {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+}
+
+/* Modals: a soft blur behind the scrim. */
+dialog::backdrop {
+  backdrop-filter: blur(3px);
+}
+
+/* Long lists (mail) skip rendering rows that are off screen, so scrolling stays smooth. */
+.cv-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 64px;
+}
+
+/* Loading placeholders: a gentle shimmer instead of a blink. */
+.skeleton {
+  background: linear-gradient(
+      100deg,
+      transparent 20%,
+      color-mix(in srgb, var(--surface) 55%, transparent) 50%,
+      transparent 80%
+    )
+    var(--surface-tertiary);
+  background-size: 220% 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton {
+    animation: shimmer 1.4s linear infinite;
+  }
+}
+@keyframes shimmer {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes check-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+}
+
+/* The sidebar and header persist across pages, so the whole-page crossfade is off. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+/*
+ * Theme switch (lib/theme.ts): the new theme is revealed in a circle growing from the
+ * toggle, over a snapshot of the old one, in one composited animation. Element
+ * transitions are paused meanwhile so nothing fades twice.
+ */
+html.theme-vt * {
+  transition: none !important;
+}
+html.theme-vt::view-transition-old(root),
+html.theme-vt::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.theme-vt::view-transition-new(root) {
+  /* Even ease-in-out: the circle accelerates and settles instead of jumping across. */
+  animation: theme-reveal 650ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0px at var(--theme-x) var(--theme-y));
+  }
+  to {
+    clip-path: circle(var(--theme-r) at var(--theme-x) var(--theme-y));
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.workbench-scale {
+  /* Full-viewport app frame. The old 111%-width + zoom:0.9 trick overflowed every page. */
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+/* Product tour (driver.js), themed with the app's tokens. */
+.driver-popover.kala-tour {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--elevated);
+  color: var(--text-primary);
+  box-shadow: var(--popover-shadow);
+  font-family: var(--font-app), ui-sans-serif, system-ui, sans-serif;
+  max-width: 340px;
+}
+.driver-popover.kala-tour .driver-popover-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+.driver-popover.kala-tour .driver-popover-description {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 20px;
+}
+.driver-popover.kala-tour .driver-popover-progress-text {
+  color: var(--text-muted);
+}
+.driver-popover.kala-tour button {
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--field);
+  color: var(--text-primary);
+  text-shadow: none;
+  font-size: 12px;
+  padding: 5px 12px;
+}
+.driver-popover.kala-tour .driver-popover-next-btn {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary);
+  color: var(--on-primary);
+}
+.driver-popover.kala-tour .driver-popover-close-btn {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+}
+.driver-popover.kala-tour .driver-popover-arrow {
+  display: none;
+}
+
+/* Dashboard grid (react-grid-layout), themed with tokens. */
+.react-grid-item.react-grid-placeholder {
+  border-radius: 12px;
+  background: var(--brand-primary);
+  opacity: 0.12;
+}
+.react-grid-item > .react-resizable-handle::after {
+  border-color: var(--text-muted);
+}
+.dashboard-editing .react-grid-item > .react-resizable-handle {
+  opacity: 1;
+  z-index: 20;
+}
+@media (prefers-reduced-motion: reduce) {
+  .react-grid-item,
+  .react-grid-layout {
+    transition: none;
+  }
+}
+
+/* Whiteboard: match the app's typeface in Excalidraw's UI and keep its own scroll. */
+.kala-whiteboard .excalidraw {
+  --ui-font: var(--font-app), ui-sans-serif, system-ui, sans-serif;
+}
